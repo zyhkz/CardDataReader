@@ -44,7 +44,14 @@ namespace CardDataReader
                 string level = properties[1];
                 builder.Append("-" + level);
             }
-            return builder.ToString();
+            return FormatCardForSimulator(builder.ToString());
+        }
+
+        private string FormatCardForSimulator(string cardString)
+        {
+            cardString = cardString.Replace("[", "");
+            cardString = cardString.Replace("]", "");
+            return cardString;
         }
 
         public string SkillDataToString(string datastring)
@@ -73,9 +80,6 @@ namespace CardDataReader
             JObject mapdata = (JObject)mapstore["data"].ElementAt(map)["MapStageDetails"].ElementAt(stage)["Levels"].ElementAt(level);
             string cards = CardListToString(mapdata["CardList"].ToString());
             string runes = RuneListToString(mapdata["RuneList"].ToString());
-            cards = cards.Replace("[", "");
-            cards = cards.Replace("]", "");
-            cards = cards.Replace("·", "");
             if (!string.IsNullOrWhiteSpace(runes))
             {
                 return runes + "," + cards;
@@ -116,128 +120,76 @@ namespace CardDataReader
             return builder.ToString();
         }
 
+        private static Dictionary<string, string> achievementIds = new Dictionary<string, string> {
+            {@"0", @"Any"},
+            {@"1", @"Round:40"},
+            {@"2", @"Round:36"},
+            {@"3", @"Round:32"},
+            {@"4", @"Round:28"},
+            {@"5", @"Round:24"},
+            {@"6", @"Round:20"},
+            {@"7", @"Round:16"},
+            {@"8", @"Round:14"},
+            {@"11", @"MyDeadCard:5"},
+            {@"12", @"MyDeadCard:4"},
+            {@"13", @"MyDeadCard:3"},
+            {@"14", @"MyDeadCard:2"},
+            {@"15", @"MyDeadCard:1"},
+            {@"16", @"MyHeroHP:60"},
+            {@"17", @"MyHeroHP:70"},
+            {@"18", @"MyHeroHP:80"},
+            {@"19", @"MyHeroHP:90"},
+            {@"20", @"MyHeroHP:100"},
+            {@"21", @"CardOfRace:K:2"},
+            {@"22", @"CardOfRace:K:3"},
+            {@"23", @"CardOfRace:K:4"},
+            {@"24", @"CardOfRace:K:5"},
+            {@"25", @"CardOfRace:K:6"},
+            {@"26", @"CardOfRace:F:2"},
+            {@"27", @"CardOfRace:F:3"},
+            {@"28", @"CardOfRace:F:4"},
+            {@"29", @"CardOfRace:F:5"},
+            {@"30", @"CardOfRace:F:6"},
+            {@"31", @"CardOfRace:H:2"},
+            {@"32", @"CardOfRace:H:3"},
+            {@"33", @"CardOfRace:H:4"},
+            {@"34", @"CardOfRace:H:5"},
+            {@"35", @"CardOfRace:H:6"},
+            {@"36", @"CardOfRace:S:2"},
+            {@"37", @"CardOfRace:S:3"},
+            {@"38", @"CardOfRace:S:4"},
+            {@"39", @"CardOfRace:S:5"},
+            {@"40", @"CardOfRace:S:6"},
+            {@"41", @"CardOfStar:1:1"},
+            {@"42", @"CardOfStar:1:2"},
+            {@"43", @"CardOfStar:1:3"},
+            {@"44", @"CardOfStar:2:1"},
+            {@"45", @"CardOfStar:2:2"},
+            {@"46", @"CardOfStar:2:3"},
+            {@"47", @"CardOfStar:3:1"},
+            {@"48", @"CardOfStar:3:2"},
+            {@"49", @"CardOfStar:3:3"},
+            {@"50", @"CardOfStar:4:1"},
+            {@"51", @"CardOfStar:4:2"},
+            {@"52", @"CardOfStar:4:3"},
+            {@"56", @"HasRune:I"},
+            {@"57", @"HasRune:F"},
+            {@"58", @"HasRune:W"},
+            {@"59", @"HasRune:G"},
+            {@"60", @"NoRune:A"},
+            {@"61", @"EnemyHeroDie"},
+            {@"62", @"EnemyAllCardsDie"}
+        };
+
         private string ConvertAchievementIdToCondition(string id)
         {
-            switch (id)
+            if (achievementIds.ContainsKey(id))
             {
-                case "0":
-                    return "Any";
-                case "1":
-                    return "Round:40";
-                case "2":
-                    return "Round:36";
-                case "3":
-                    return "Round:32";
-                case "4":
-                    return "Round:28";
-                case "5":
-                    return "Round:24";
-                case "6":
-                    return "Round:20";
-                case "7":
-                    return "Round:16";
-                case "8":
-                    return "Round:14";
-                case "11":
-                    return "MyDeadCard:5";
-                case "12":
-                    return "MyDeadCard:4";
-                case "13":
-                    return "MyDeadCard:3";
-                case "14":
-                    return "MyDeadCard:2";
-                case "15":
-                    return "MyDeadCard:1";
-                case "16":
-                    return "MyHeroHP:60";
-                case "17":
-                    return "MyHeroHP:70";
-                case "18":
-                    return "MyHeroHP:80";
-                case "19":
-                    return "MyHeroHP:90";
-                case "20":
-                    return "MyHeroHP:100";
-                case "21":
-                    return "CardOfRace:K:2";
-                case "22":
-                    return "CardOfRace:K:3";
-                case "23":
-                    return "CardOfRace:K:4";
-                case "24":
-                    return "CardOfRace:K:5";
-                case "25":
-                    return "CardOfRace:K:6";
-                case "26":
-                    return "CardOfRace:F:2";
-                case "27":
-                    return "CardOfRace:F:3";
-                case "28":
-                    return "CardOfRace:F:4";
-                case "29":
-                    return "CardOfRace:F:5";
-                case "30":
-                    return "CardOfRace:F:6";
-                case "31":
-                    return "CardOfRace:H:2";
-                case "32":
-                    return "CardOfRace:H:3";
-                case "33":
-                    return "CardOfRace:H:4";
-                case "34":
-                    return "CardOfRace:H:5";
-                case "35":
-                    return "CardOfRace:H:6";
-                case "36":
-                    return "CardOfRace:S:2";
-                case "37":
-                    return "CardOfRace:S:3";
-                case "38":
-                    return "CardOfRace:S:4";
-                case "39":
-                    return "CardOfRace:S:5";
-                case "40":
-                    return "CardOfRace:S:6";
-                case "41":
-                    return "CardOfStar:1:1";
-                case "42":
-                    return "CardOfStar:1:2";
-                case "43":
-                    return "CardOfStar:1:3";
-                case "44":
-                    return "CardOfStar:2:1";
-                case "45":
-                    return "CardOfStar:2:2";
-                case "46":
-                    return "CardOfStar:2:3";
-                case "47":
-                    return "CardOfStar:3:1";
-                case "48":
-                    return "CardOfStar:3:2";
-                case "49":
-                    return "CardOfStar:3:3";
-                case "50":
-                    return "CardOfStar:4:1";
-                case "51":
-                    return "CardOfStar:4:2";
-                case "52":
-                    return "CardOfStar:4:3";
-                case "56":
-                    return "HasRune:I";
-                case "57":
-                    return "HasRune:F";
-                case "58":
-                    return "HasRune:W";
-                case "59":
-                    return "HasRune:G";
-                case "60":
-                    return "NoRune:A";
-                case "61":
-                    return "EnemyHeroDie";
-                case "62":
-                    return "EnemyAllCardsDie";
-                default:
-                    throw new Exception("Unknown AchievementId: " + id);
+                return achievementIds[id];
+            }
+            else
+            {
+                throw new Exception("Unknown AchievementId: " + id);
             }
         }
 
@@ -312,31 +264,30 @@ namespace CardDataReader
             String mapid = map + "-" + stage + "-" + level;
 
             mapid = mapid.Replace("-13-", "-H2-");
-            int lastStage = 0;
+            int hideStage = 0;
             if (map >= 11)
             {
-                lastStage = 12;
+                hideStage = 12;
             }
             else if (map >= 8)
             {
-                lastStage = 11;
+                hideStage = 11;
             }
             else if (map == 7)
             {
-                lastStage = 10;
+                hideStage = 10;
             }
             else if (map >= 5)
             {
-                lastStage = 9;
+                hideStage = 9;
             }
             else if (map >= 3)
             {
-                lastStage = 8;
+                hideStage = 8;
             }
-
-            if (lastStage != 0)
+            if (hideStage != 0)
             {
-                mapid = mapid.Replace(string.Format("-{0}-", lastStage), "-H-");
+                mapid = mapid.Replace(string.Format("-{0}-", hideStage), "-H-");
             }
             return mapid;
         }
