@@ -44,20 +44,23 @@ namespace CardDataReader
                 string level = properties[1];
                 builder.Append("-" + level);
             }
-            return FormatCardForSimulator(builder.ToString());
-        }
-
-        private string FormatCardForSimulator(string cardString)
-        {
-            cardString = cardString.Replace("[", "");
-            cardString = cardString.Replace("]", "");
-            return cardString;
+            return builder.ToString();
         }
 
         public string SkillDataToString(string datastring)
         {
             JObject skill = (JObject)skillstore["data"]["Skills"].Where(p => p["SkillId"].ToString() == datastring).First();
-            return skill["Name"].ToString();
+            return FormatSkillForSimulator(skill["Name"].ToString());
+        }
+
+        private string FormatSkillForSimulator(string skillString)
+        {
+            skillString = skillString.Replace("[", "");
+            skillString = skillString.Replace("]", "");
+            skillString = skillString.Replace("：", "");
+            skillString = skillString.Replace("!", "");
+            skillString = skillString.Replace(" ", "");
+            return skillString;
         }
 
         public string RuneDataToString(string datastring)
@@ -258,38 +261,36 @@ namespace CardDataReader
 
         private string GetMapId(int map, int stage, int level)
         {
-            map = map + 1;
-            stage = stage + 1;
-            level = level + 1;
-            String mapid = map + "-" + stage + "-" + level;
+            return GetStageId(map, stage) + "-" + (level + 1);
+        }
 
-            mapid = mapid.Replace("-13-", "-H2-");
-            int hideStage = 0;
-            if (map >= 11)
+        private string GetStageId(int map, int stage)
+        {
+            string stageId = (stage + 1).ToString();
+            switch (mapstore["data"].ElementAt(map)["MapStageDetails"].ElementAt(stage)["Type"].ToString())
             {
-                hideStage = 12;
+                case "0":
+                    if (mapstore["data"].ElementAt(map)["MapStageDetails"].ElementAt(stage - 1)["Type"].ToString() != "2")
+                    {
+                        stageId = "H2";
+                    }
+                    else
+                    {
+                        stageId = "H";
+                    }
+                    break;
+                case "1":
+                    break;
+                case "2":
+                    break;
+                case "3":
+                case "4":
+                    stageId = "T";
+                    break;
+                default:
+                    throw new Exception("Unknow stage type");
             }
-            else if (map >= 8)
-            {
-                hideStage = 11;
-            }
-            else if (map == 7)
-            {
-                hideStage = 10;
-            }
-            else if (map >= 5)
-            {
-                hideStage = 9;
-            }
-            else if (map >= 3)
-            {
-                hideStage = 8;
-            }
-            if (hideStage != 0)
-            {
-                mapid = mapid.Replace(string.Format("-{0}-", hideStage), "-H-");
-            }
-            return mapid;
+            return (map + 1) + "-" + stageId;
         }
 
         private static int[] hps = new int[] {
@@ -321,9 +322,39 @@ namespace CardDataReader
             }
         }
 
+        public string LoadMapOptions(int map)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine(string.Format(@"                                    <optgroup label=""{0}-{1}"">", map + 1, mapstore["data"].ElementAt(map)["Name"]));
+            for (int stage = 0; stage < mapstore["data"].ElementAt(map)["MapStageDetails"].Count(); stage++)
+            {
+                string stageType = mapstore["data"].ElementAt(map)["MapStageDetails"].ElementAt(stage)["Type"].ToString();
+                if (stageType != "0" && stageType != "1" && stageType != "2")
+                {
+                    continue;
+                }
+                if (stage == 0)
+                {
+                    builder.AppendLine(string.Format(@"                                        <option value=""{0}"" selected=""selected"">{0} {1}</option>", GetStageId(map, stage), mapstore["data"].ElementAt(map)["MapStageDetails"].ElementAt(stage)["Name"]));
+                }
+                else
+                {
+                    builder.AppendLine(string.Format(@"                                        <option value=""{0}"">{0} {1}</option>", GetStageId(map, stage), mapstore["data"].ElementAt(map)["MapStageDetails"].ElementAt(stage)["Name"]));
+                }
+            }
+            builder.AppendLine(@"                                    </optgroup>");
+            return builder.ToString();
+        }
+
         public string LoadAllMapOptions()
         {
-            throw new NotImplementedException();
+            StringBuilder builder = new StringBuilder();
+            int count = mapstore["data"].Count();
+            for (int i = count - 1; i >= 0; i--)
+            {
+                builder.Append(LoadMapOptions(i));
+            }
+            return builder.ToString();
         }
     }
 }

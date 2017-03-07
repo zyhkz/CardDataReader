@@ -1,0 +1,17 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/CardDataReader/v14
+/CardDataReader/bin/Debug/Newtonsoft.Json.xml
+/CardDataReader/bin/Debug/Newtonsoft.Json.pdb
+/CardDataReader/bin/Debug/Newtonsoft.Json.dll
+/CardDataReader/bin/Debug/CardDataReader.pdb
+/CardDataReader/bin/Debug/CardDataReader.exe.config
+/CardDataReader/bin/Debug/CardDataReader.exe
+/CardDataReader/obj/Debug/CardDataReader.Properties.Resources.resources
+/CardDataReader/obj/Debug/CardDataReader.pdb
+/CardDataReader/obj/Debug/CardDataReader.Form1.resources
+/CardDataReader/obj/Debug/CardDataReader.exe
+/CardDataReader/obj/Debug/CardDataReader.csprojResolveAssemblyReference.cache
+/CardDataReader/obj/Debug/CardDataReader.csproj.GenerateResource.Cache
