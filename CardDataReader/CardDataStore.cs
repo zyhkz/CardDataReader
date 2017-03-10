@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace CardDataReader
 {
@@ -20,6 +22,62 @@ namespace CardDataReader
             runestore = JsonDataReader.ReadJsonFile(@"data\allrune");
             skillstore = JsonDataReader.ReadJsonFile(@"data\allskill");
             mapstore = JsonDataReader.ReadJsonFile(@"data\allstage");
+        }
+
+        public string GetCardIdByName(string name)
+        {
+            JObject card = (JObject)cardstore["data"]["Cards"].Where(p => p["CardName"].ToString() == name).First();
+            return card["CardId"].ToString();
+        }
+
+        public void DownloadCardPicture(string name, string fileMax, string fileMin)
+        {
+            string id = GetCardIdByName(name);
+            string urlMax = string.Format(@"http://cache.ifreecdn.com/mkhx/public/swf/card/370_570/img_maxCard_{0}.jpg", id);
+            string urlMin = string.Format(@"http://cache.ifreecdn.com/mkhx/public/swf/card/110_110/img_photoCard_{0}.jpg", id);
+            using (WebClient client = new WebClient())
+            {
+                client.DownloadFile(urlMax, fileMax);
+                client.DownloadFile(urlMin, fileMin);
+            }
+        }
+
+        public string DownloadPictures(string xmlfile)
+        {
+            string fileMinF = @"Min\{0}.jpg";
+            string fileMaxF = @"Max\{0}.jpg";
+
+            string[] list = { "1322", "1323", "1324", "1325", "1326", "1327", "1328", "1329", "1330", "1331", "1332", "1333", "1334", "1335", "1336", "1337", "1338", "1339", "1340", "1341", "1342", "1343", "1344", "1345", "1346", "1347", "1348", "1349", "1350", "1351", "1352", "1353", "1354", "1442", "1443", "150201", "150401", "150501", "150701", "151201", "151301", "151701", "152001", "1535", "1536", "1537", "154101", "1563", "1564", "1566", "1567", "1568", "1569", "1570", "1571", "1572", "1573", "1574", "1575", "1576", "1577", "1578", "1579", "1580", "1581", "1582", "1583", "1584", "1585", "2322", "2323", "2324", "2325", "2326", "2327", "2328", "2329", "2330", "2331", "2332", "2333", "2334", "2335", "2336", "250101", "250201", "251301", "251501", "2552", "2553", "2554", "2555", "3320", "3321", "3322", "3323", "3324", "3325", "3326", "3327", "3328", "3329", "3330", "3331", "3332", "3333", "3334", "3335", "3336", "3337", "3338", "3442", "3443", "350101", "350201", "350301", "350401", "350601", "3527", "3550", "3551", "3552", "3553", "3554", "3555", "3556", "3557", "3558", "3559", "3560", "3561", "3562", "3563", "4326", "4327", "4328", "4329", "4330", "4331", "4332", "4333", "4334", "4335", "4336", "4337", "4338", "441301", "450101", "450201", "450301", "450401", "450801", "451001", "451901", "4548", "4558", "4559", "4560", "4561", "4562", "4563", "4564", "4565", "5599", "5701", "5702", "5703", "5704", "5705", "5706", "7503", "7504", "7505", "7506", "7507", "8201", "8202", "8203", "8301", "8302", "8303", "8304", "8401", "8402", "8501", "8305", "8306", "8307" };
+            StringBuilder builder = new StringBuilder();
+
+            XmlDocument document = new XmlDocument();
+            document.Load(xmlfile);
+            foreach (XmlNode node in document["Cards"])
+            {
+                string id = string.Empty;
+                try
+                {
+                    id = node.Attributes["id"].Value;
+                }
+                catch
+                {
+                    continue;
+                }
+                if (!list.Contains(id))
+                {
+                    continue;
+                }
+                string name = node.Attributes["name"].Value;
+                try
+                {
+                    DownloadCardPicture(name, string.Format(fileMaxF, id), string.Format(fileMinF, id));
+                }
+                catch
+                {
+                    builder.Append(id + ",");
+                }
+            }
+            return builder.ToString();
         }
 
         public string CardDataToString(string datastring)

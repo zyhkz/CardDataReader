@@ -18,7 +18,7 @@ namespace CardDataReader
             Application.SetCompatibleTextRenderingDefault(false);
             //Application.Run(new Form1());
             CardDataStore store = new CardDataStore();
-            Clipboard.SetText(store.LoadAllMapOptions());
+            Clipboard.SetText(store.DownloadPictures(@"data\CardData.xml"));
             MessageBox.Show("OK");
         }
     }
